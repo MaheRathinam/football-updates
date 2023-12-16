@@ -2,8 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { CountryComponent } from './country/country.component';
+import { MatButtonToggleModule } from '@angular/material/button-toggle'
 
 @Component({
   selector: 'app-root',

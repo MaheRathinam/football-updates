@@ -1,0 +1,23 @@
+.logo {
+  height: 2rem;
+  width: 2rem;
+}
+
+.row-clicked {
+  font-weight: bold;
+}
+
+.mat-mdc-row .mat-mdc-cell {
+  border-bottom: 1px solid transparent;
+  border-top: 1px solid transparent;
+  cursor: pointer;
+}
+
+.mat-mdc-row:hover .mat-mdc-cell {
+  border-color: currentColor;
+}
+
+.standingTable {
+  min-width: 80rem;
+  margin-left: 2rem;
+}
