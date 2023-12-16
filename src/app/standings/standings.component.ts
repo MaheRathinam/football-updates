@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { MatTableModule } from '@angular/material/table';
 import { Router } from '@angular/router';
-import { Country, Fixtures, Standings } from '../model';
+import { Country, Fixtures, StandingResponse, Standings } from '../model';
 import { FootballService } from '../service/football.service';
 import { CommonModule } from '@angular/common';
 
@@ -41,9 +41,9 @@ export class StandingsComponent {
     if (this.leagueId) {
       this.footballService
         .getStangingsByLeague(this.leagueId)
-        .subscribe((response) => {
+        .subscribe((response: StandingResponse) => {
           let standings: Standings[] = response.api.standings[0];
-          this.dataSource = standings.map((r) => ({
+          this.dataSource = standings.map((r: Standings) => ({
             logo: r.logo,
             teamName: r.teamName,
             matchsPlayed: r.all?.matchsPlayed,

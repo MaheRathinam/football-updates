@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { Country, League } from '../model';
+import { Country, League, LeagueResponse } from '../model';
 import { CommonModule } from '@angular/common';
 import { FootballService } from '../service/football.service';
 import { StandingsComponent } from '../standings/standings.component';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 
 @Component({
   selector: 'app-country',
@@ -54,14 +54,14 @@ export class CountryComponent {
    * To fetch league ids
    */
   ngOnInit(): void {
-    this.activatedRoute.queryParamMap.subscribe((params) => {
+    this.activatedRoute.queryParamMap.subscribe((params: ParamMap) => {
       this.selectedLeague = JSON.parse(params.get('leagueId') || '0');
-      const countries : []  = JSON.parse(params.get('countries') || '{}');
+      const countries : Country[]  = JSON.parse(params.get('countries') || '[]');
       if(countries.length){
         this.countryList = countries;
       }
     });
-    this.footballService.getCurrentSeasonLeagues().subscribe((response) => {
+    this.footballService.getCurrentSeasonLeagues().subscribe((response: LeagueResponse) => {
       this.setLeagueId(response?.api?.leagues);
     });
   }
@@ -80,7 +80,7 @@ export class CountryComponent {
   setLeagueId(leagues: League[]) {
     for (let item of this.countryList) {
       let league: League[] = leagues.filter(
-        (data) =>
+        (data: League) =>
           data.country === item.name &&
           data.name === item.topLeague &&
           data.is_current === 1

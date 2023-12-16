@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Country, Fixtures } from '../model';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { Country, Fixtures, FixturesResponse } from '../model';
 import { MatTableModule } from '@angular/material/table';
 import { FootballService } from '../service/football.service';
 import {MatButtonModule} from '@angular/material/button';
@@ -25,7 +25,7 @@ export class FixturesComponent {
     'awayTeamLogo'    
   ];
   leagueId: number = 0;
-  countries: [] = [];
+  countries: Country[] = [];
   constructor(
     private footballService: FootballService,
     private activatedRoute: ActivatedRoute, 
@@ -36,14 +36,13 @@ export class FixturesComponent {
    * Fetch last  10 games for the selected team
    */
   ngOnInit(): void {
-    this.activatedRoute.queryParamMap.subscribe((params) => {
+    this.activatedRoute.queryParamMap.subscribe((params: ParamMap) => {
       let teamId: number = JSON.parse(params.get('teamId') || '');
       this.leagueId = JSON.parse(params.get('leagueId') || '');
       this.countries = JSON.parse(params.get('countries') || '');
       if(teamId){
-        this.footballService.getFixturesForTeam(teamId).subscribe((response) => {
+        this.footballService.getFixturesForTeam(teamId).subscribe((response: FixturesResponse) => {
           let fixtures : Fixtures[] = response.api.fixtures;
-          localStorage.setItem('fixtures', JSON.stringify(response));
           this.dataSource = fixtures.map((r: Fixtures) => ({
             homeLogo: r.homeTeam.logo,
             homeTeamName: r.homeTeam.team_name,                  
