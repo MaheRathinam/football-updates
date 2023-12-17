@@ -1,8 +1,7 @@
-<mat-button-toggle-group name="country" aria-label="country" class="countryGroup" [value]="selectedLeague">
-    <mat-button-toggle *ngFor="let item of countryList" (change)="onCountryChange(item)" class="country" [value]="item.leagueId"
-        [id]="item.id">{{ item.name }}</mat-button-toggle>
+<mat-button-toggle-group name="country" aria-label="country" class="countryGroup" [value]="selectedCountry">
+    <mat-button-toggle *ngFor="let countryName of countryList" (change)="onCountryChange(countryName)" class="country"
+        [value]="countryName.name" [id]="countryName.id">{{ countryName.name }}</mat-button-toggle>
 </mat-button-toggle-group>
 
-<ng-container *ngIf="selectedLeague">
-    <app-standings [leagueId]="selectedLeague" [countries] = "countryList"></app-standings>
-</ng-container>
+
+<app-standings [leagueId]="selectedLeague" [country]="selectedCountry" [season] = "selectedSeason"></app-standings>

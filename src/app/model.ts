@@ -1,81 +1,96 @@
-export interface Country {
+export type Country = {
   name: string;
   id: string;
   topLeague: string;
-  leagueId?: number;  
-}
+  leagueId?: number;
+};
 
 export type LeagueResponse = {
-  api: {
-    results: number;
-    leagues: League[];
-  };
+  response: [League];
 };
 
 export type League = {
-  league_id: number;
-  name: string;
-  type?: string;
-  country: string;
-  country_code: string;
-  season: number;
-  season_start?: string;
-  season_end?: string;
-  logo?: string;
-  flag?: string;
-  standings?: number;
-  is_current: number;
+  league: {
+    id: number;
+    name: string;
+    logo: string;
+  };
+  country: {
+    name: string;
+    code: string;
+    flag: string;
+  };
+  seasons: [
+    {
+      year: number;
+      current: string;
+    }
+  ];
 };
 
 export type Standings = {
-  team_id: number;
-  teamName: string;
-  logo: string;
-  group?: string;
+  team?: {
+    id: number;
+    name: string;
+    logo: string;
+  };
+  goalsDiff: number;
+  points: number;
   matchsPlayed?: number;
   win?: number;
   draw?: number;
   lose?: number;
+  team_id?: number;
   all?: {
-    matchsPlayed: number;
+    played: number;
     win: number;
     draw: number;
     lose: number;
   };
-  goalsDiff: number;
-  points: number;
 };
 
 export type StandingResponse = {
-  api: {
-    results: number;
-    standings: Standings[][];
-  };
+  response: [
+    {
+      league: {
+        id: number;
+        season: number;
+        standings: Standings[][];
+      };
+    }
+  ];
 };
 
 export type FixturesResponse = {
-  api:{
-    results: number;
-    fixtures: Fixtures[];
-  }
-}
+  response: [Team];
+};
 
-export type Fixtures = {
-  team_id?: number;
+export type Team = {
+  teams: {
+    home: {
+      id: number;
+      name: string;
+      logo: string;
+    };
+    away: {
+      id: number;
+      name: string;
+      logo: string;
+    };
+  };
+  goals: {
+    home: number;
+    away: number;
+  };
+
   homeLogo?: string;
   homeTeamName?: string;
   awayTeamName?: string;
   awayTeamLogo?: string;
-  homeTeam:{
-    team_id : number;
-    team_name: string;
-    logo: string;
-  };
-  awayTeam:{
-    team_id : number;
-    team_name: string;
-    logo: string;
-  };  
   goalsHomeTeam: number;
   goalsAwayTeam: number;
-}
+};
+
+type AllowedKeys = 'england' | 'spain' | 'france' | 'germany' | 'italy';
+export type LeagueId = { topLeague: string; leagueId: number; season: number };
+export type LeagueIds = { [K in AllowedKeys]: LeagueId };

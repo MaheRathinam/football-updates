@@ -1,7 +1,7 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, SimpleChanges } from '@angular/core';
 import { MatTableModule } from '@angular/material/table';
 import { Router } from '@angular/router';
-import { Country, Fixtures, StandingResponse, Standings } from '../model';
+import { StandingResponse, Standings } from '../model';
 import { FootballService } from '../service/football.service';
 import { CommonModule } from '@angular/common';
 
@@ -27,47 +27,57 @@ export class StandingsComponent {
   dataSource: Standings[] = [];
   selectedTeam: number = 0;
   @Input() leagueId: number = 0;
-  @Input() countries: Country[] = [];
-
+  @Input() country: string = '';
+  @Input() season: number = 0;
 
   constructor(
     private footballService: FootballService,
     private route: Router
   ) {}
+
   /**
-   * Display standings based on the user selected country
+   * To detect league id changes
    */
-  ngOnChanges() {
-    if (this.leagueId) {
-      this.footballService
-        .getStangingsByLeague(this.leagueId)
-        .subscribe((response: StandingResponse) => {
-          let standings: Standings[] = response.api.standings[0];
-          this.dataSource = standings.map((r: Standings) => ({
-            logo: r.logo,
-            teamName: r.teamName,
-            matchsPlayed: r.all?.matchsPlayed,
-            win: r.all?.win,
-            lose: r.all?.lose,
-            draw: r.all?.lose,
-            goalsDiff: r.goalsDiff,
-            points: r.points,
-            team_id: r.team_id,
-          }));
-        });
+  ngOnChanges(changes: SimpleChanges) {
+    let currentValue = changes['leagueId']?.currentValue;
+    if (currentValue && currentValue !== changes['leagueId']?.previousValue) {
+      this.displayStandings();
     }
+  }
+
+  /**
+   * Display standings of the top league for the selected country
+   */
+  displayStandings() {
+    this.footballService
+      .getStangingsByLeague(this.leagueId, this.season)
+      .subscribe((data: StandingResponse) => {        
+        let standings: Standings[] = data.response[0].league.standings[0];
+        this.dataSource = standings.map((item: Standings) => ({
+          logo: item.team?.logo,
+          teamName: item.team?.name,
+          matchsPlayed: item.all?.played,
+          win: item.all?.win,
+          lose: item.all?.lose,
+          draw: item.all?.lose,
+          goalsDiff: item.goalsDiff,
+          points: item.points,
+          team_id: item.team?.id,
+        }));
+      });
   }
 
   /**
    * To load Fixture component for the selected team
    */
-  getFixtures(row: Fixtures) {
+  getFixtures(row: Standings) {
     this.selectedTeam = row.team_id || 0;
     this.route.navigate(['/fixture'], {
       queryParams: {
         teamId: JSON.stringify(row.team_id),
         leagueId: JSON.stringify(this.leagueId),
-        countries : JSON.stringify(this.countries),
+        season: JSON.stringify(this.season),
+        country: JSON.stringify(this.country),
       },
     });
   }

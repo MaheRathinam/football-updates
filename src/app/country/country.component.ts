@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { Country, League, LeagueResponse } from '../model';
+import { Country, League, LeagueId, LeagueIds, LeagueResponse } from '../model';
 import { CommonModule } from '@angular/common';
 import { FootballService } from '../service/football.service';
 import { StandingsComponent } from '../standings/standings.component';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-country',
@@ -16,6 +16,7 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
 export class CountryComponent {
   selectedLeague: number = 0;
   selectedCountry: string = '';
+  selectedSeason: number = 0;
 
   countryList: Country[] = [
     {
@@ -45,6 +46,14 @@ export class CountryComponent {
     },
   ];
 
+  leagueIds: LeagueIds = {
+    england: { topLeague: 'Premier League', leagueId: 0, season: 0 },
+    spain: { topLeague: 'La Liga', leagueId: 0, season: 0 },
+    france: { topLeague: 'Ligue 1', leagueId: 0, season: 0 },
+    germany: { topLeague: 'Bundesliga', leagueId: 0, season: 0 },
+    italy: { topLeague: 'Serie A', leagueId: 0, season: 0 },
+  };
+
   constructor(
     private footballService: FootballService,
     private activatedRoute: ActivatedRoute
@@ -54,40 +63,37 @@ export class CountryComponent {
    * To fetch league ids
    */
   ngOnInit(): void {
-    this.activatedRoute.queryParamMap.subscribe((params: ParamMap) => {
+    this.activatedRoute.queryParamMap.subscribe((params) => {
       this.selectedLeague = JSON.parse(params.get('leagueId') || '0');
-      const countries : Country[]  = JSON.parse(params.get('countries') || '[]');
-      if(countries.length){
-        this.countryList = countries;
-      }
-    });
-    this.footballService.getCurrentSeasonLeagues().subscribe((response: LeagueResponse) => {
-      this.setLeagueId(response?.api?.leagues);
+      this.selectedSeason = JSON.parse(params.get('season') || '0');
+      this.selectedCountry = JSON.parse(params.get('country') || '0');
     });
   }
 
   /**
    * To display standing component for the selected country
    */
-  onCountryChange(item: Country) {
-    this.selectedLeague = item.leagueId || 0;
-  }
-
-  /**
-   * To get league id for the current season and the input cocuntries
-   * @param leagues
-   */
-  setLeagueId(leagues: League[]) {
-    for (let item of this.countryList) {
-      let league: League[] = leagues.filter(
-        (data: League) =>
-          data.country === item.name &&
-          data.name === item.topLeague &&
-          data.is_current === 1
-      );
-      if (league?.length && league[0].league_id) {
-        item.leagueId = league[0].league_id;
-      }
+  onCountryChange(country: Country) {
+    this.selectedCountry = country.name;
+    let league: LeagueId =
+      this.leagueIds[country.name.toLowerCase() as keyof typeof this.leagueIds];
+    if (league.leagueId) {
+      this.selectedLeague = league.leagueId;
+      this.selectedSeason = league.season;
+    } else {
+      this.footballService
+        .getCurrentSeasonLeagues(country.name)
+        .subscribe((data: LeagueResponse) => {
+          let topLeagueData: League[] = data?.response.filter(
+            (item) =>
+              item.league.name === league.topLeague &&
+              item.country.name === country.name
+          );
+          this.selectedLeague = topLeagueData[0].league.id;
+          this.selectedSeason = topLeagueData[0].seasons[0].year;
+          league.leagueId = this.selectedLeague;
+          league.season = this.selectedSeason;
+        });
     }
   }
 }

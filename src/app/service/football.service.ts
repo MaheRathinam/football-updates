@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { LeagueResponse, StandingResponse, FixturesResponse } from '../model';
 
@@ -7,43 +7,41 @@ import { LeagueResponse, StandingResponse, FixturesResponse } from '../model';
   providedIn: 'root',
 })
 export class FootballService {
-  httpHeaders: HttpHeaders = new HttpHeaders({
-    'x-rapidapi-key': '4861e1ef198d48f5785fb26771174df3',
-  });
-  apiURL: string = 'https://v2.api-football.com';
+  apiURL: string = 'https://v3.football.api-sports.io';
 
   constructor(private http: HttpClient) {}
 
   /**
-   * To fetch current season league ids
+   * To fetch current season top league id for the  selected country
    */
-  getCurrentSeasonLeagues(): Observable<LeagueResponse> {
-    return this.http.get<LeagueResponse>(`${this.apiURL}/leagues/current/`, {
-      headers: this.httpHeaders,
-    });
-  }
-
-  /**
-   * To fetch Stanings for the input league id
-   */
-  getStangingsByLeague(leagueId: number): Observable<StandingResponse> {
-    return this.http.get<StandingResponse>(
-      `${this.apiURL}/leagueTable/${leagueId}`,
-      {
-        headers: this.httpHeaders,
-      }
+  getCurrentSeasonLeagues(country: string): Observable<LeagueResponse> {
+    return this.http.get<LeagueResponse>(
+      `${this.apiURL}/leagues?current=true&country=${country}`
     );
   }
 
   /**
-   * To fetch fixtures for the selected team
+   * To fetch Standings for the input league id and season
    */
-  getFixturesForTeam(teamId: number): Observable<FixturesResponse> {
+  getStangingsByLeague(
+    leagueId: number,
+    season: number
+  ): Observable<StandingResponse> {
+    return this.http.get<StandingResponse>(
+      `${this.apiURL}/standings?league=${leagueId}&season=${season}`
+    );
+  }
+
+  /**
+   * To fetch last 10 games results for the selected team
+   */
+  getRecentMatchesForTeam(
+    teamId: number,
+    leagueId: number,
+    season: number
+  ): Observable<FixturesResponse> {
     return this.http.get<FixturesResponse>(
-      `${this.apiURL}/fixtures/team/${teamId}/last/10`,
-      {
-        headers: this.httpHeaders,
-      }
+      `${this.apiURL}/fixtures?league=${leagueId}&season=${season}&team=${teamId}&last=10`
     );
   }
 }
