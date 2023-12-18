@@ -48,10 +48,10 @@ export class StandingsComponent {
   /**
    * Display standings of the top league for the selected country
    */
-  displayStandings() {
+  private displayStandings(): void {
     this.footballService
       .getStangingsByLeague(this.leagueId, this.season)
-      .subscribe((data: StandingResponse) => {        
+      .subscribe((data: StandingResponse) => {
         let standings: Standings[] = data.response[0].league.standings[0];
         this.dataSource = standings.map((item: Standings) => ({
           logo: item.team?.logo,
@@ -59,7 +59,7 @@ export class StandingsComponent {
           matchsPlayed: item.all?.played,
           win: item.all?.win,
           lose: item.all?.lose,
-          draw: item.all?.lose,
+          draw: item.all?.draw,
           goalsDiff: item.goalsDiff,
           points: item.points,
           team_id: item.team?.id,
@@ -74,10 +74,10 @@ export class StandingsComponent {
     this.selectedTeam = row.team_id || 0;
     this.route.navigate(['/fixture'], {
       queryParams: {
-        teamId: JSON.stringify(row.team_id),
-        leagueId: JSON.stringify(this.leagueId),
-        season: JSON.stringify(this.season),
-        country: JSON.stringify(this.country),
+        teamId: row.team_id,
+        leagueId: this.leagueId,
+        season: this.season,
+        country: this.country,
       },
     });
   }

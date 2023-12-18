@@ -64,9 +64,9 @@ export class CountryComponent {
    */
   ngOnInit(): void {
     this.activatedRoute.queryParamMap.subscribe((params) => {
-      this.selectedLeague = JSON.parse(params.get('leagueId') || '0');
-      this.selectedSeason = JSON.parse(params.get('season') || '0');
-      this.selectedCountry = JSON.parse(params.get('country') || '0');
+      this.selectedLeague = parseInt(params.get('leagueId') ?? '0');
+      this.selectedSeason = parseInt(params.get('season') ?? '0');
+      this.selectedCountry = params.get('country') ?? '0';
     });
   }
 

@@ -38,10 +38,10 @@ export class FixturesComponent {
    */
   ngOnInit(): void {
     this.activatedRoute.queryParamMap.subscribe((params) => {
-      let teamId: number = JSON.parse(params.get('teamId') || '');
-      this.leagueId = JSON.parse(params.get('leagueId') || '');
-      this.season = JSON.parse(params.get('season') || '');
-      this.selectedCountry = JSON.parse(params.get('country') || '');
+      let teamId: number = parseInt(params.get('teamId') ?? '0');
+      this.leagueId = parseInt(params.get('leagueId') ?? '0');
+      this.season = parseInt(params.get('season') ?? '0');
+      this.selectedCountry = params.get('country') ?? '';
       if (teamId) {
         this.getRecentResults(teamId);
       }
@@ -51,11 +51,11 @@ export class FixturesComponent {
   /**
    * To fetch last  10 game results for the selected team
    */
-  getRecentResults(teamId: number) {
+  private getRecentResults(teamId: number): void {
     this.footballService
       .getRecentMatchesForTeam(teamId, this.leagueId, this.season)
       .subscribe((data: FixturesResponse) => {
-        let teams: Team[] = data.response;        
+        let teams: Team[] = data.response;
         this.dataSource = teams.map((item: Team) => ({
           homeLogo: item.teams.home.logo,
           homeTeamName: item.teams.home.name,
@@ -66,7 +66,7 @@ export class FixturesComponent {
           home: item.teams.home,
           away: item.teams.away,
           goals: item.goals,
-          teams:item.teams
+          teams: item.teams,
         }));
       });
   }
@@ -75,6 +75,12 @@ export class FixturesComponent {
    * To load previous selected country when the user clicks back button
    */
   navigateBack() {
-    this.route.navigate(['/country'], { queryParams: {leagueId: JSON.stringify(this.leagueId), season: JSON.stringify(this.season), country: JSON.stringify(this.selectedCountry) } }); 
+    this.route.navigate(['/country'], {
+      queryParams: {
+        leagueId: this.leagueId,
+        season: this.season,
+        country: this.selectedCountry,
+      },
+    });
   }
 }
