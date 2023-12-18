@@ -1,5 +1,7 @@
 {
   "routes": [
-    "/"
+    "/",
+    "/country",
+    "/fixture"
   ]
 }
